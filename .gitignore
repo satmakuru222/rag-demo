@@ -1,0 +1,7 @@
+.env
+chroma_db/
+rag.db
+logs/
+__pycache__/
+*.pyc
+keycloak/gdrive-service-account.json

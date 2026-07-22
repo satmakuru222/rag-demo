@@ -1,0 +1,22 @@
+{
+  "realm": "rag-demo",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "rag-app",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "change-me-in-keycloak",
+      "redirectUris": ["http://localhost:8501/*"],
+      "webOrigins": ["http://localhost:8501"],
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false
+    }
+  ],
+  "roles": {
+    "realm": [
+      {"name": "rag-user", "description": "Standard RAG app user"},
+      {"name": "rag-admin", "description": "Can view audit logs"}
+    ]
+  }
+}
