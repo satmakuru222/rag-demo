@@ -333,5 +333,5 @@ docker compose up -d   # Keycloak data persists in Docker volume
 
 ## Built by The AI Stackk
 
-YouTube: [The AI Stackk](https://youtube.com/@theaistackk)
-Episode: *Build a Production RAG Platform from Scratch*
+YouTube Channel: [The AI Stackk](https://youtube.com/@theaistackk)
+Episode: *[Build a Production RAG Platform from Scratch](https://youtu.be/CHthBCS2R2g?si=garYDgJkyRquVye9)*
