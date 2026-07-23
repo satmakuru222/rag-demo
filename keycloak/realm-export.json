@@ -6,9 +6,15 @@
       "clientId": "rag-app",
       "enabled": true,
       "publicClient": false,
-      "secret": "change-me-in-keycloak",
-      "redirectUris": ["http://localhost:8501/*"],
-      "webOrigins": ["http://localhost:8501"],
+      "secret": "rag-app-secret-2026-the-ai-stackk",
+      "redirectUris": [
+        "http://localhost:8501/*",
+        "https://localhost:8501/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8501",
+        "https://localhost:8501"
+      ],
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false
     }
@@ -18,5 +24,17 @@
       {"name": "rag-user", "description": "Standard RAG app user"},
       {"name": "rag-admin", "description": "Can view audit logs"}
     ]
-  }
+  },
+  "users": [
+    {
+      "username": "santoshi",
+      "email": "santoshi.atmakuru@gmail.com",
+      "firstName": "Santoshi",
+      "lastName": "Atmakuru",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{"type": "password", "value": "demo1234", "temporary": false}],
+      "realmRoles": ["rag-admin"]
+    }
+  ]
 }

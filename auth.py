@@ -3,8 +3,13 @@ import secrets
 import httpx
 import streamlit as st
 from jose import jwt
+from dotenv import load_dotenv
 
-KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL", "http://localhost:8080")
+load_dotenv()
+
+KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL", "https://localhost:8443")
+# Use mkcert root CA so httpx trusts our local SSL cert
+_CA_CERT = os.path.join(os.path.dirname(__file__), "certs", "rootCA.pem")
 REALM = os.environ.get("KEYCLOAK_REALM", "rag-demo")
 CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID", "rag-app")
 CLIENT_SECRET = os.environ.get("KEYCLOAK_CLIENT_SECRET", "")
@@ -31,12 +36,13 @@ def _exchange_code(code: str) -> dict:
         "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI,
         "code": code,
-    }, timeout=10)
-    resp.raise_for_status()
+    }, verify=_CA_CERT, timeout=10)
+    if resp.status_code != 200:
+        raise Exception(f"Token exchange failed ({resp.status_code}): {resp.text}")
     return resp.json()
 
 def _decode_token(id_token: str) -> dict:
-    jwks = httpx.get(JWKS_URL, timeout=10).json()
+    jwks = httpx.get(JWKS_URL, verify=_CA_CERT, timeout=10).json()
     return jwt.decode(
         id_token,
         jwks,
@@ -56,8 +62,17 @@ def require_auth() -> dict | None:
     params = st.query_params.to_dict()
 
     if "code" in params:
+        # Guard: only exchange a code once — Keycloak invalidates after first use
+        code = params["code"]
+        if st.session_state.get("_exchanged_code") == code:
+            st.error("Auth code already used. Click below to log in again.")
+            state = secrets.token_urlsafe(16)
+            st.markdown(f"[**Sign in again →**]({_login_url(state)})")
+            st.stop()
+            return None
+        st.session_state["_exchanged_code"] = code
         try:
-            tokens = _exchange_code(params["code"])
+            tokens = _exchange_code(code)
             claims = _decode_token(tokens["id_token"])
             user = {
                 "id": claims["sub"],
@@ -69,7 +84,10 @@ def require_auth() -> dict | None:
             st.query_params.clear()
             st.rerun()
         except Exception as e:
+            st.session_state.pop("_exchanged_code", None)
             st.error(f"Login failed: {e}")
+            state = secrets.token_urlsafe(16)
+            st.markdown(f"[**Try logging in again →**]({_login_url(state)})")
             st.stop()
         return None
 

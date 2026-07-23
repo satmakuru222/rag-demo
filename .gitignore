@@ -4,4 +4,7 @@ rag.db
 logs/
 __pycache__/
 *.pyc
-keycloak/gdrive-service-account.json
+credentials/
+certs/localhost.pem
+certs/localhost-key.pem
+# rootCA.pem is safe to commit (public cert, not the key)
